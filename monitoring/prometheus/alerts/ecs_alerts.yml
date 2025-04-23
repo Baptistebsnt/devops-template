@@ -1,0 +1,56 @@
+groups:
+  - name: ecs
+    rules:
+      - alert: HighCPUUtilization
+        expr: avg(rate(container_cpu_usage_seconds_total[5m])) by (container_name) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU utilization on {{ $labels.container_name }}"
+          description: "Container {{ $labels.container_name }} has been using more than 80% CPU for 5 minutes"
+
+      - alert: HighMemoryUtilization
+        expr: (container_memory_usage_bytes / container_spec_memory_limit_bytes) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory utilization on {{ $labels.container_name }}"
+          description: "Container {{ $labels.container_name }} has been using more than 80% memory for 5 minutes"
+
+      - alert: ContainerRestarts
+        expr: rate(container_restarts_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container restarts detected on {{ $labels.container_name }}"
+          description: "Container {{ $labels.container_name }} has restarted in the last 5 minutes"
+
+      - alert: ECSServiceDesiredTasks
+        expr: aws_ecs_service_desired_count - aws_ecs_service_running_count > 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "ECS service {{ $labels.service_name }} has fewer running tasks than desired"
+          description: "ECS service {{ $labels.service_name }} has {{ $value }} fewer running tasks than desired for 5 minutes"
+
+      - alert: ECSClusterMemoryReservation
+        expr: aws_ecs_cluster_memory_reservation > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory reservation in ECS cluster"
+          description: "ECS cluster has more than 80% memory reserved for 5 minutes"
+
+      - alert: ECSClusterCPUReservation
+        expr: aws_ecs_cluster_cpu_reservation > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU reservation in ECS cluster"
+          description: "ECS cluster has more than 80% CPU reserved for 5 minutes"

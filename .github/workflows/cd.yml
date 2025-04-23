@@ -1,0 +1,40 @@
+name: Continuous Deployment
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to Staging
+        env:
+          STAGING_API_KEY: ${{ secrets.STAGING_API_KEY }}
+        run: |
+          echo "Deploying to staging environment..."
+          # Example deployment command
+          ./deploy.sh staging $STAGING_API_KEY
+
+  deploy-production:
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://your-production-environment.com
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to Production
+        env:
+          PRODUCTION_API_KEY: ${{ secrets.PRODUCTION_API_KEY }}
+        run: |
+          echo "Deploying to production environment..."
+          # Example deployment command
+          ./deploy.sh production $PRODUCTION_API_KEY

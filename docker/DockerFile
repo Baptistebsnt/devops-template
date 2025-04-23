@@ -1,0 +1,41 @@
+# Use an official Node.js runtime as a parent image
+# Copilot: Incorporate best practices for a production-ready Node.js Dockerfile
+FROM node:16-alpine
+
+# Set the working directory
+WORKDIR /usr/src/app
+
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install --production
+
+# Copy the application source code
+COPY . .
+
+# Expose the application port
+EXPOSE 3000
+
+# Define the command to run the application
+CMD ["node", "server.js"]
+
+# Use an official Python runtime as a parent image
+# Copilot: Incorporate best practices for a production-ready Python Dockerfile
+FROM python:3.9-slim
+
+# Set the working directory
+WORKDIR /usr/src/app
+
+# Install dependencies
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the application source code
+COPY . .
+
+# Expose the application port
+EXPOSE 5000
+
+# Define the command to run the application
+CMD ["python", "app.py"]
