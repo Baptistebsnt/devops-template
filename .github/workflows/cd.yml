@@ -1,40 +1,44 @@
-name: Continuous Deployment
+# cd.yml - Continuous Deployment Workflow
+name: CD Pipeline
 
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
+    tags:
+      - "v*.*.*"
 
 jobs:
   deploy-staging:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Deploy to Staging
-        env:
-          STAGING_API_KEY: ${{ secrets.STAGING_API_KEY }}
+      - name: Deploy to staging
         run: |
           echo "Deploying to staging environment..."
-          # Example deployment command
-          ./deploy.sh staging $STAGING_API_KEY
+          # Add actual deployment commands here
 
   deploy-production:
     needs: deploy-staging
     runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+
     environment:
       name: production
-      url: https://your-production-environment.com
+      url: https://your-production-site.com
+
     steps:
+      - name: Manual approval
+        uses: hmarr/auto-approve-action@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Deploy to Production
-        env:
-          PRODUCTION_API_KEY: ${{ secrets.PRODUCTION_API_KEY }}
+      - name: Deploy to production
         run: |
-          echo "Deploying to production environment..."
-          # Example deployment command
-          ./deploy.sh production $PRODUCTION_API_KEY
+          echo "Deploying to production..."
+          # Add actual deployment commands here
